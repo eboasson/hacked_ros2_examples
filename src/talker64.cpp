@@ -40,7 +40,7 @@ class Talker64 : public rclcpp::Node
 {
 public:
   explicit Talker64(const std::string & topic_name, size_t size)
-  : Node("talker64")
+  : Node("talker")
   {
     // Create a function for when messages are to be sent.
     auto publish_message =
