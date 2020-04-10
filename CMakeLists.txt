@@ -40,10 +40,14 @@ ament_target_dependencies(talker64 rclcpp std_msgs)
 add_executable(roundtrip64 src/roundtrip64.cpp)
 ament_target_dependencies(roundtrip64 rclcpp std_msgs)
 
+add_executable(selftalker64 src/selftalker64.cpp)
+ament_target_dependencies(selftalker64 rclcpp std_msgs)
+
 install(TARGETS
   listener64
   talker64
   roundtrip64
+  selftalker64
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
