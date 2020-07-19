@@ -19,6 +19,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -43,11 +44,15 @@ ament_target_dependencies(roundtrip64 rclcpp std_msgs)
 add_executable(selftalker64 src/selftalker64.cpp)
 ament_target_dependencies(selftalker64 rclcpp std_msgs)
 
+add_executable(pointcloud src/pointcloud.cpp)
+ament_target_dependencies(pointcloud rclcpp sensor_msgs)
+
 install(TARGETS
   listener64
   talker64
   roundtrip64
   selftalker64
+  pointcloud
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
