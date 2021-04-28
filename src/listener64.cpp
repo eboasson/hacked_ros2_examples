@@ -19,7 +19,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rcutils/cmdline_parser.h"
 
-#include "std_msgs/msg/int64_multi_array.hpp"
+#include "hacked_demo/msg/test.hpp"
 
 void print_usage()
 {
@@ -41,21 +41,20 @@ public:
     // Create a callback function for when messages are received.
     // Variations of this function also exist using, for example UniquePtr for zero-copy transport.
     auto callback =
-      [this](const std_msgs::msg::Int64MultiArray::SharedPtr msg) -> void
+      [this](const hacked_demo::msg::Test::SharedPtr msg) -> void
       {
         uint64_t now = clock_.now().nanoseconds();
-        int64_t data = msg->data[0];
         if (prev_)
         {
           uint32_t pseq = (prev_ >> 48);
-          uint32_t nseq = (data >> 48);
+          uint32_t nseq = (msg->info >> 48);
           lost += ((nseq <= pseq) ? 32768 : 0) + nseq - pseq - 1;
           rcvd++;
-          uint64_t dt = ((int64_t) (now << 16) - (data << 16)) >> 16;
+          uint64_t dt = ((int64_t) (now << 16) - (msg->info << 16)) >> 16;
           if (dt < minlat) minlat = dt;
           latsum += dt;
         }
-        prev_ = data;
+        prev_ = msg->info;
         if (tprint + 1000000000 < now)
         {
           RCLCPP_INFO(this->get_logger(), "rcvd %llu lost %llu minlat %.3fus avglat %.3fus", rcvd, lost, (double) minlat / 1e3, (double) latsum / (double) rcvd / 1e3);
@@ -69,11 +68,11 @@ public:
     // publishers.
     // Note that not all publishers on the same topic with the same type will be compatible:
     // they must have compatible Quality of Service policies.
-    sub_ = create_subscription<std_msgs::msg::Int64MultiArray>(topic_name, 10, callback);
+    sub_ = create_subscription<hacked_demo::msg::Test>(topic_name, 10, callback);
   }
 
 private:
-  rclcpp::Subscription<std_msgs::msg::Int64MultiArray>::SharedPtr sub_;
+  rclcpp::Subscription<hacked_demo::msg::Test>::SharedPtr sub_;
   rclcpp::Clock clock_;
   uint64_t prev_ = 0;
   uint64_t lost = 0;

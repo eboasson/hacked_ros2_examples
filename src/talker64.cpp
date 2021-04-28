@@ -21,7 +21,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rcutils/cmdline_parser.h"
 
-#include "std_msgs/msg/int64_multi_array.hpp"
+#include "hacked_demo/msg/test.hpp"
 
 using namespace std::chrono_literals;
 
@@ -47,26 +47,24 @@ public:
       [this, size]() -> void
       {
         uint64_t now = clock_.now().nanoseconds();
-        msg_ = std::make_unique<std_msgs::msg::Int64MultiArray>();
-        msg_->data.clear ();
-        msg_->data.push_back ((int64_t) ((((uint64_t) count_ & 0x7fff) << 48) | (now & 0xffffffffffff)));
-        msg_->data.resize (size);
+        msg_ = std::make_unique<hacked_demo::msg::Test>();
+        msg_->info = (((uint64_t) count_ & 0x7fff) << 48) | (now & 0xffffffffffff);
         count_++;
         pub_->publish(std::move(msg_));
       };
 
     // Create a publisher with a custom Quality of Service profile.
     rclcpp::QoS qos(rclcpp::KeepLast(7));
-    pub_ = this->create_publisher<std_msgs::msg::Int64MultiArray>(topic_name, qos);
+    pub_ = this->create_publisher<hacked_demo::msg::Test>(topic_name, qos);
 
     // Use a timer to schedule periodic message publishing.
-    timer_ = this->create_wall_timer(1ms, publish_message);
+    timer_ = this->create_wall_timer(1000ms, publish_message);
   }
 
 private:
   size_t count_ = 1;
-  std::unique_ptr<std_msgs::msg::Int64MultiArray> msg_;
-  rclcpp::Publisher<std_msgs::msg::Int64MultiArray>::SharedPtr pub_;
+  std::unique_ptr<hacked_demo::msg::Test> msg_;
+  rclcpp::Publisher<hacked_demo::msg::Test>::SharedPtr pub_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Clock clock_;
 };

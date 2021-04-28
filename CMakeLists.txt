@@ -32,11 +32,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+set(MESSAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}:msg/Test.msg")
+rosidl_generate_interfaces(hacked_demo
+    ${MESSAGE_FILES}
+    DEPENDENCIES builtin_interfaces)
+
 add_executable(listener64 src/listener64.cpp)
-ament_target_dependencies(listener64 rclcpp std_msgs)
+ament_target_dependencies(listener64 rclcpp)
+rosidl_target_interfaces(listener64 hacked_demo "rosidl_typesupport_cpp")
 
 add_executable(talker64 src/talker64.cpp)
-ament_target_dependencies(talker64 rclcpp std_msgs)
+ament_target_dependencies(talker64 rclcpp)
+rosidl_target_interfaces(talker64 hacked_demo "rosidl_typesupport_cpp")
 
 add_executable(roundtrip64 src/roundtrip64.cpp)
 ament_target_dependencies(roundtrip64 rclcpp std_msgs)
