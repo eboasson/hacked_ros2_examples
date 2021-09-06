@@ -20,6 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -33,17 +34,20 @@ if(BUILD_TESTING)
 endif()
 
 set(MESSAGE_FILES "${CMAKE_CURRENT_SOURCE_DIR}:msg/Test.msg")
-rosidl_generate_interfaces(hacked_demo
+rosidl_generate_interfaces(${PROJECT_NAME}_msgs
     ${MESSAGE_FILES}
-    DEPENDENCIES builtin_interfaces)
+    DEPENDENCIES builtin_interfaces
+    LIBRARY_NAME ${PROJECT_NAME}
+    SKIP_INSTALL)
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}_msgs" "rosidl_typesupport_cpp")
 
 add_executable(listener64 src/listener64.cpp)
+target_link_libraries(listener64 "${cpp_typesupport_target}")
 ament_target_dependencies(listener64 rclcpp)
-rosidl_target_interfaces(listener64 hacked_demo "rosidl_typesupport_cpp")
 
 add_executable(talker64 src/talker64.cpp)
+target_link_libraries(talker64 "${cpp_typesupport_target}")
 ament_target_dependencies(talker64 rclcpp)
-rosidl_target_interfaces(talker64 hacked_demo "rosidl_typesupport_cpp")
 
 add_executable(roundtrip64 src/roundtrip64.cpp)
 ament_target_dependencies(roundtrip64 rclcpp std_msgs)
