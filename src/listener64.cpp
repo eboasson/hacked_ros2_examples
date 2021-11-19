@@ -52,14 +52,16 @@ public:
           rcvd++;
           uint64_t dt = ((int64_t) (now << 16) - (msg->info << 16)) >> 16;
           if (dt < minlat) minlat = dt;
+          if (dt > maxlat) maxlat = dt;
           latsum += dt;
         }
         prev_ = msg->info;
         if (tprint + 1000000000 < now)
         {
-          RCLCPP_INFO(this->get_logger(), "rcvd %llu lost %llu minlat %.3fus avglat %.3fus", rcvd, lost, (double) minlat / 1e3, (double) latsum / (double) rcvd / 1e3);
+          RCLCPP_INFO(this->get_logger(), "rcvd %llu lost %llu minlat %.3fus avglat %.3fus maxlat %.3fus", rcvd, lost, (double) minlat / 1e3, (double) latsum / (double) rcvd / 1e3, (double) maxlat / 1e3);
           rcvd = lost = latsum = 0;
           minlat = UINT64_MAX;
+          maxlat = 0;
           tprint = now;
         }
       };
@@ -79,6 +81,7 @@ private:
   uint64_t rcvd = 0;
   uint64_t latsum = 0;
   uint64_t minlat = UINT64_MAX;
+  uint64_t maxlat = 0;
   uint64_t tprint = 0;
 };
 
