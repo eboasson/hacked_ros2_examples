@@ -49,6 +49,7 @@ public:
         uint64_t now = clock_.now().nanoseconds();
         msg_ = std::make_unique<hacked_demo::msg::Test>();
         msg_->info = (((uint64_t) count_ & 0x7fff) << 48) | (now & 0xffffffffffff);
+        static_cast<void>(size); // not used for this message type
         count_++;
         pub_->publish(std::move(msg_));
       };
@@ -58,7 +59,7 @@ public:
     pub_ = this->create_publisher<hacked_demo::msg::Test>(topic_name, qos);
 
     // Use a timer to schedule periodic message publishing.
-    timer_ = this->create_wall_timer(1000ms, publish_message);
+    timer_ = this->create_wall_timer(167us, publish_message);
   }
 
 private:
